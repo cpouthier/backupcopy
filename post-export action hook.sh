@@ -35,6 +35,9 @@ EOF
 # Execute the export action
 kubectl create -f export-action.yaml
 
+# Clean up the temporary file
+rm -f export-action.yaml
+
 # Get the name of the export action into a variable
 EXPORT_ACTION_NAME=$(kubectl get exportaction -n kasten-io --sort-by=.metadata.creationTimestamp -o json | \
   jq -r --arg prefix "export-$APPLICATION_NAMESPACE-$LATEST_RESTORE_POINT" '.items[] | select(.metadata.name | startswith($prefix)) | .metadata.name' | tail -n 1)
