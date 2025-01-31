@@ -21,3 +21,7 @@ An export action is defined in YAML format, specifying the restore point to be e
 The script then applies this configuration initiating the export process.
 
 In summary, this script automates the process of exporting the latest restore point of a specified Kubernetes application to a secondary storage location using Veeam Kasten.
+
+# Work In Progress
+- Include this script into a Kanister blueprint as a post-export hook for ease of use into Veeam Kasten GUI.
+- Document limitations
