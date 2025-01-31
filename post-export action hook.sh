@@ -6,11 +6,12 @@ APPLICATION_NAMESPACE=wordpress
 SECONDARY_LOCATION_PROFILE=s3-standard
 
 #Identifying latest local restore point...
-LATEST_RESTORE_POINT=$(kubectl get restorepoints.apps.kio.kasten.io -n $APPLICATION_NAMESPACE  --sort-by=.metadata.creationTimestamp -o json | \
+LATEST_RESTORE_POINT=$(kubectl get restorepoints.apps.kio.kasten.io -n $APPLICATION_NAMESPACE --sort-by=.metadata.creationTimestamp -o json | \
     jq -r '.items[] | select(.metadata.labels["k10.kasten.io/exportProfile"] | not) | .metadata.name' | tail -n 1)
 
-# Create on-demand export action that exports $latest_restore_point
-# from the $APPLICATION_NAMESPACE using $LOCATION_PROFILE.
+
+# Create on-demand export action that exports $LATEST_RESTORE_POINT
+# from the $APPLICATION_NAMESPACE using $SECONDARY_LOCATION_PROFILE.
 # Assumes that Veeam Kasten is installed in 'kasten-io' namespace.
 
 cat > export-action.yaml <<EOF
@@ -44,9 +45,10 @@ EXPORT_ACTION_NAME=$(kubectl get exportaction -n kasten-io --sort-by=.metadata.c
 
 # Extract the creationTimestamp and receiveString fields from the export action so it can be reused in a DR plan with another Kasten instance.
 # Define the output file
-OUTPUT_LOG="lastest_secondary_export.txt"
 
-# Extract the secondary export time stamp and receive string from the export action and store them in the output log file
+OUTPUT_LOG="latest_secondary_export.txt"
+
+# Extract the secondary export timestamp and receive string from the export action and store them in the output log file
 kubectl get exportaction $EXPORT_ACTION_NAME -n kasten-io -o yaml | \
   awk '/creationTimestamp:/ && !found {print "Creation Timestamp:", $2; found=1} /receiveString:/ {print "Receive String:", $2} END {print ""}' > "$OUTPUT_LOG"
 
