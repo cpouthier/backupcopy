@@ -24,4 +24,4 @@ In summary, this script automates the process of exporting the latest restore po
 
 # Work In Progress
 - Include this script into a Kanister blueprint as a post-export hook for ease of use into Veeam Kasten GUI.
-- Document limitations
+- Document limitations and constraints
