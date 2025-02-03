@@ -1,5 +1,5 @@
 # Backup Copy
-This script is designed to automate the export of the most recent restore point of a Kubernetes application to a secondary storage location using Veeam Kasten data management platform.
+This script is designed to automate the export of the most recent restore point of a Kubernetes application to a secondary storage location using also Veeam Kasten data management platform.
 
 ## Here's a breakdown of its functionality:
 
