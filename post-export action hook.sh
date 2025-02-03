@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Define Application Namespace
-APPLICATION_NAMESPACE=wordpress
+APPLICATION_NAMESPACE=namespace_name
 # Define Secondary Location Profile
-SECONDARY_LOCATION_PROFILE=s3-standard
+SECONDARY_LOCATION_PROFILE=location_name
 
 #Identifying latest local restore point...
 LATEST_RESTORE_POINT=$(kubectl get restorepoints.apps.kio.kasten.io -n $APPLICATION_NAMESPACE --sort-by=.metadata.creationTimestamp -o json | \
