@@ -1,14 +1,11 @@
 # Backup Copy
-This script is designed to automate the export of the most recent restore point of a Kubernetes application to a secondary storage location using also Veeam Kasten data management platform.
 
-## Here's a breakdown of its functionality:
+This blueprint is designed to automate the export of the most recent restore point of a Kubernetes application to a secondary storage location using also Veeam Kasten data management platform.
 
-### Set Variables:
-APPLICATION_NAMESPACE=*yourapplication*: Specifies the Kubernetes namespace of the application.
-
-SECONDARY_LOCATION_PROFILE=*yoursecondaryrepository*: Defines the profile name for the secondary storage location.
+## Here's a breakdown of its functionality
 
 ### Identify the Latest Local Restore Point:
+
 This part of the script retrieves the most recent restore point within the specified application namespace that has been previously exported.
 
 It uses kubectl to list restore points, sorts them by creation timestamp, and filters out those already associated with an export profile.
@@ -16,22 +13,46 @@ It uses kubectl to list restore points, sorts them by creation timestamp, and fi
 The name of the latest restore point is stored in the LATEST_RESTORE_POINT variable.
 
 ### Create an On-Demand Export Action:
+
 An export action is defined in YAML format, specifying the restore point to be exported and the secondary location profile.
 
 The script then applies this configuration initiating the export process.
 
 In summary, this script automates the process of exporting the latest restore point of a specified Kubernetes application to a secondary storage location using Veeam Kasten.
 
-# SECTIONS BELOW ARE STILL WIP
+# How to use this blueprint
 
-- Document limitations and constraints
+## Pre-requisite
+
+Before adding the blueprint, you must ensure that the secondary repository has been configured into Veeam Kasten as a new location profile as it needs to be hardcoded in the blueprint to run properly.
+
+## Create and apply the blueprint in Veeam Kasten's GUI
+
+In the Veeam Kasten's GUI, click on Blueprints and then "Add a blueprint" or "Create New Blueprint":
+
+![alt text](https://raw.githubusercontent.com/cpouthier/backupcopy/main/img/bpstep1.png)
+
+In the Add Blueprint screen copy and paste the content of the blueprint. **Do not forget to modifiy it indicating the location profile to be used to export the backup copy.** Once you're done, click on "Validate and Save".
+
+![alt text](https://raw.githubusercontent.com/cpouthier/backupcopy/main/img/bpstep2.png)
+
+This blueprint is unsing the bitnami/kubectl image. So if you're running into an airgapped environment you must ensure that you can pull this image from a private registry, and then you'll need to modify the image address into the blueprint:
+
+![alt text](https://raw.githubusercontent.com/cpouthier/backupcopy/main/img/bpstep-airgap.png)
+
+You can now create your backup policy as usual, but add in the "Pre and Post-Export Action Hooks" section add the blueprint as shown below and save the policy:
+
+![alt text](https://raw.githubusercontent.com/cpouthier/backupcopy/main/img/bpstep3.png)
+
+You can now run your policy!
 
 # What you need to know about Backup-copy
 
 This blueprint is designed to enable the restoration of a workload from a secondary copy in the event of a disaster affecting the location profile where backups are exported. It also covers scenarios involving a complete disaster.
 
 ## Architectural context
-LLet's imagine you have two different datacenters.
+
+Let's imagine you have two different datacenters.
 
 In DC#1, you have a Kubernetes cluster running a workload and a Veeam Kasten instance. The Veeam Kasten instance is configured to run a backup policy on the workload and export the backup to an S3 storage located in DC#1. As part of this policy, you add the backup-copy-bp blueprint as a post-export hook, configuring the SECONDARY_LOCATION_PROFILE to point to the S3 storage in DC#2.
 
@@ -42,6 +63,7 @@ Meanwhile, you also have a K10-DR policy running regularly, which exports Veeam 
 ![alt text](https://raw.githubusercontent.com/cpouthier/backupcopy/main/img/step1.png)
 
 ## Recover from a huge disaster on DC#1
+
 Imagine you're now facing a catastrophic disaster in DC#1, where everything is lost (S3 storage, Kubernetes cluster, Veeam Kasten, workload, etc.), and you need to restore your workloads in DC#2.
 
 The first step is to recreate your Kubernetes cluster, if it hasn't already been done.
