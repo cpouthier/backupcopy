@@ -52,7 +52,7 @@ This blueprint is designed to enable the restoration of a workload from a second
 
 ## Architectural context
 
-Let's imagine you have two different datacenters.
+Let's imagine you have two different datacenters in an Active-Passive way.
 
 In DC#1, you have a Kubernetes cluster running a workload and a Veeam Kasten instance. The Veeam Kasten instance is configured to run a backup policy on the workload and export the backup to an S3 storage located in DC#1. As part of this policy, you add the backup-copy-bp blueprint as a post-export hook, configuring the SECONDARY_LOCATION_PROFILE to point to the S3 storage in DC#2.
 
