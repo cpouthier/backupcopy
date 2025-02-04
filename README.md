@@ -46,6 +46,16 @@ You can now create your backup policy as usual, but add in the "Pre and Post-Exp
 
 You can now run your policy!
 
+## Optionnally
+
+If you want to set up a retention date for the backup copy.
+
+The expiration timestamp needs to be hardcoded in the blueprint following RFC3339 format.
+
+As example, if you want your second copy to be retained for one month, set the "expiresAt:" spec value as:
+
+`expiresAt: $(date -u --date="1 month" "+%Y-%m-%dT%H:%M:%SZ")`
+
 # What you need to know about Backup-copy
 
 This blueprint is designed to enable the restoration of a workload from a secondary copy in the event of a disaster affecting the location profile where backups are exported. It also covers scenarios involving a complete disaster.
