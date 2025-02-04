@@ -39,6 +39,8 @@ Meanwhile, you also have a K10-DR policy running regularly, which exports Veeam 
 
 *Due to the way Veeam Kasten manages its encryption keys, **running the Veeam Kasten DR to DC#2 is mandatory**. This ensures that you can restore the entire Kasten catalog, which contains all the encryption keys used for workload backups as well as all the restore points.*
 
+![alt text](https://raw.githubusercontent.com/cpouthier/backupcopy/main/img/step1.png)
+
 ## Recover from a huge disaster on DC#1
 Let's imagine you're now facing a catastrophic disaster in DC#1, where everything is lost (S3 storage, Kubernetes cluster, Veeam Kasten, workload, etc.), and you need to restore your workloads in DC#2.
 
