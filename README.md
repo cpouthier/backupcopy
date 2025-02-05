@@ -54,6 +54,19 @@ As example, if you want your second copy to be retained for one month, set the "
 
 `expiresAt: $(date -u --date="1 month" "+%Y-%m-%dT%H:%M:%SZ")`
 
+## Error handling
+
+In anycase, the blueprint which creates the export action will only run if initial export succeeded (post-export action hook configured with "After-On Success"). In other terms, that means:
+
+* If the snapshot phase doesn't succeed, then the initial export as well as the backup copy export will not run.
+* If the snapshot phase succeed and the initial export fails, then the second backup copy will not run.
+* If the snapshot phase as well as the inital export succeed, then the second backup copy will run.
+
+When the backup copy will run, it will create a new manual export action in Veeam Kasten and you'll be able to monitor it in the GUI:
+
+![alt text](https://raw.githubusercontent.com/cpouthier/backupcopy/main/img/bpdashboard.png)
+
+
 # What you need to know about Backup-copy
 
 This blueprint is designed to enable the restoration of a workload from a secondary copy in the event of a disaster affecting the location profile where backups are exported. It also covers scenarios involving a complete disaster.
