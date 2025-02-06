@@ -38,7 +38,9 @@ This blueprint is unsing the bitnami/kubectl image. So if you're running into an
 
 ![alt text](https://raw.githubusercontent.com/cpouthier/backupcopy/main/img/bpstep-airgap.png)
 
-You can now create your backup policy as usual, but add in the "Pre and Post-Export Action Hooks" section add the blueprint as shown below and save the policy:
+You can now create your backup policy as usual, but add in the "Pre and Post-Export Action Hooks" section add the blueprint as shown below and save the policy.
+
+**WARNING: You need to set up a 1-day minimal retention for your shapshot on the policy!**
 
 ![alt text](https://raw.githubusercontent.com/cpouthier/backupcopy/main/img/bpstep3.png)
 
