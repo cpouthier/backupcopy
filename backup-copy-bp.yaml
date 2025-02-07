@@ -34,8 +34,11 @@ actions:
             namespace: kasten-io
           spec:
             # Expiration timestamp in ``RFC3339`` format. Optional.
+            # Example: #expiresAt: "2002-10-02T15:00:00Z"
             # Garbage collector will automatically retire expired exports if this field is set.
-            #expiresAt: "2002-10-02T15:00:00Z"
+            # Example: if you wan to set up expiration date 1 month from current date, you can use the following: 
+            #expiresAt: $(date -u --date="1 month" "+%Y-%m-%dT%H:%M:%SZ") 
+            
             subject:
               kind: RestorePoint
               name: $LATEST_RESTORE_POINT
