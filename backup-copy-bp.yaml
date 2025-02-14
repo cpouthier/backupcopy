@@ -24,8 +24,7 @@ actions:
 
               #Identifying latest local restore point...
 
-              LATEST_RESTORE_POINT=$(kubectl get
-              restorepoints.apps.kio.kasten.io -n $APPLICATION_NAMESPACE
+              LATEST_RESTORE_POINT=$(kubectl get restorepoints.apps.kio.kasten.io -n $APPLICATION_NAMESPACE \
               --sort-by=.metadata.creationTimestamp -o json | \
                 jq -r '.items[] | select(.metadata.labels["k10.kasten.io/exportProfile"] | not) | .metadata.name' | tail -n 1)
 
@@ -41,10 +40,12 @@ actions:
               kind: ExportAction
 
               metadata:
-                generateName: export-$APPLICATION_NAMESPACE-$LATEST_RESTORE_POINT
+                name: export-$APPLICATION_NAMESPACE-$LATEST_RESTORE_POINT-$SECONDARY_LOCATION_PROFILE
                 namespace: kasten-io
                 labels:
                   k10.kasten.io/exportType: portableAppData
+                  k10.kasten.io/exportProfile: $SECONDARY_LOCATION_PROFILE
+                  k10.kasten.io/exportNamespace: $APPLICATION_NAMESPACE
               spec:
                 # Expiration timestamp in ``RFC3339`` format. Optional.
                 # Garbage collector will automatically retire expired exports if this field is set.
