@@ -1,55 +1,76 @@
-apiVersion: cr.kanister.io/v1alpha1
 kind: Blueprint
+apiVersion: cr.kanister.io/v1alpha1
 metadata:
   name: backup-copy-blueprint
   namespace: kasten-io
 actions:
   post-export:
+    name: ""
     kind: Namespace
     phases:
-    - func: KubeTask
-      name: backup-copy
-      args:
-        image: bitnami/kubectl
-        command:
-        - /bin/sh
-        - -c
-        - |
-          APPLICATION_NAMESPACE="{{ .Namespace.Name }}"
-          # Define the secondary location profile depending on your context
-          SECONDARY_LOCATION_PROFILE=s3-standard
-          #Identifying latest local restore point...
-          LATEST_RESTORE_POINT=$(kubectl get restorepoints.apps.kio.kasten.io -n $APPLICATION_NAMESPACE --sort-by=.metadata.creationTimestamp -o json | \
-            jq -r '.items[] | select(.metadata.labels["k10.kasten.io/exportProfile"] | not) | .metadata.name' | tail -n 1)
+      - func: KubeTask
+        name: backup-copy
+        args:
+          image: bitnami/kubectl
+          command:
+            - /bin/sh
+            - -c
+            - >
+              APPLICATION_NAMESPACE="{{ .Namespace.Name }}"
 
-          # Create on-demand export action that exports $LATEST_RESTORE_POINT
-          # from the $APPLICATION_NAMESPACE using $SECONDARY_LOCATION_PROFILE.
-          # Assumes that Veeam Kasten is installed in 'kasten-io' namespace.
+              # Define the secondary location profile depending on your context
 
-          cat > export-action.yaml <<EOF
-          apiVersion: actions.kio.kasten.io/v1alpha1
-          kind: ExportAction
-          metadata:
-            generateName: export-$APPLICATION_NAMESPACE-$LATEST_RESTORE_POINT
-            namespace: kasten-io
-          spec:
-            # Expiration timestamp in ``RFC3339`` format. Optional.
-            # Example: #expiresAt: "2002-10-02T15:00:00Z"
-            # Garbage collector will automatically retire expired exports if this field is set.
-            # Example: if you wan to set up expiration date 1 month from current date, you can use the following: 
-            #expiresAt: $(date -u --date="1 month" "+%Y-%m-%dT%H:%M:%SZ") 
-            
-            subject:
-              kind: RestorePoint
-              name: $LATEST_RESTORE_POINT
-              namespace: $APPLICATION_NAMESPACE
-            profile:
-              name: $SECONDARY_LOCATION_PROFILE
-              namespace: kasten-io
-          EOF
+              SECONDARY_LOCATION_PROFILE=backup_copy_location
 
-          # Execute the export action
-          kubectl create -f export-action.yaml
+              #Identifying latest local restore point...
 
-          # Clean up the temporary file
-          rm -f export-action.yaml
+              LATEST_RESTORE_POINT=$(kubectl get
+              restorepoints.apps.kio.kasten.io -n $APPLICATION_NAMESPACE
+              --sort-by=.metadata.creationTimestamp -o json | \
+                jq -r '.items[] | select(.metadata.labels["k10.kasten.io/exportProfile"] | not) | .metadata.name' | tail -n 1)
+
+              # Create on-demand export action that exports
+              $LATEST_RESTORE_POINT
+
+              # from the $APPLICATION_NAMESPACE using
+              $SECONDARY_LOCATION_PROFILE.
+
+              # Assumes that Veeam Kasten is installed in 'kasten-io' namespace.
+
+
+              cat > export-action.yaml <<EOF
+
+              apiVersion: actions.kio.kasten.io/v1alpha1
+
+              kind: ExportAction
+
+              metadata:
+                generateName: export-$APPLICATION_NAMESPACE-$LATEST_RESTORE_POINT
+                namespace: kasten-io
+                labels:
+                  k10.kasten.io/exportType: portableAppData
+              spec:
+                # Expiration timestamp in ``RFC3339`` format. Optional.
+                # Garbage collector will automatically retire expired exports if this field is set.
+                #expiresAt: "2002-10-02T15:00:00Z"
+                expiresAt: $(date -u --date="1 day" "+%Y-%m-%dT%H:%M:%SZ")
+                subject:
+                  kind: RestorePoint
+                  name: $LATEST_RESTORE_POINT
+                  namespace: $APPLICATION_NAMESPACE
+                profile:
+                  name: $SECONDARY_LOCATION_PROFILE
+                  namespace: kasten-io
+                exportData:
+                  enabled: true
+              EOF
+
+
+              # Execute the export action
+
+              kubectl create -f export-action.yaml
+
+
+              # Clean up the temporary file
+
+              rm -f export-action.yaml
