@@ -2,6 +2,10 @@
 
 This blueprint automates the process of exporting the latest restore point of a specified Kubernetes application to a secondary storage location using Veeam Kasten.
 
+**WARNING**
+
+The provided blueprint **is not supported by the editor and is supplied as-is**. Functionality, compatibility, and correctness are not guaranteed. Please verify and adjust as needed before use.
+
 ## Here's a breakdown of its functionality
 
 ### Identify the Latest Local Restore Point:
