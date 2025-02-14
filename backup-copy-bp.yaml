@@ -34,7 +34,7 @@ actions:
               # Assumes that Veeam Kasten is installed in 'kasten-io' namespace.
 
 
-              cat > export-action.yaml <<EOF
+              echo | kubectl apply -f - <<EOF
 
               apiVersion: actions.kio.kasten.io/v1alpha1
 
@@ -60,13 +60,3 @@ actions:
                 exportData:
                   enabled: true
               EOF
-
-
-              # Execute the export action
-
-              kubectl create -f export-action.yaml
-
-
-              # Clean up the temporary file
-
-              rm -f export-action.yaml

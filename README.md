@@ -52,6 +52,7 @@ You can now run your policy!
 
 ## Optionnally
 
+### Specific retention
 If you want to set up a retention date for the backup copy.
 
 The expiration timestamp needs to be hardcoded in the blueprint following RFC3339 format.
@@ -59,6 +60,45 @@ The expiration timestamp needs to be hardcoded in the blueprint following RFC333
 As an example, if you want your second copy to be retained for one month, set the "expiresAt:" spec value as:
 
 `expiresAt: $(date -u --date="1 month" "+%Y-%m-%dT%H:%M:%SZ")`
+
+### Third export
+If for any reason you need also to have a third copy you can simply add a new export action in the blueprint as below and modify it appropriately:
+
+```
+            THIRD_LOCATION_PROFILE=third_copy_location
+
+              # Create on-demand export action that exports $LATEST_RESTORE_POINT
+              # from the $APPLICATION_NAMESPACE using $THIRD_LOCATION_PROFILE.
+              # Assumes that Veeam Kasten is installed in 'kasten-io' namespace.
+
+
+              echo | kubectl apply -f -  <<EOF
+
+              apiVersion: actions.kio.kasten.io/v1alpha1
+
+              kind: ExportAction
+
+              metadata:
+                generateName: export-$APPLICATION_NAMESPACE-$LATEST_RESTORE_POINT-3
+                namespace: kasten-io
+                labels:
+                  k10.kasten.io/exportType: portableAppData
+              spec:
+                # Expiration timestamp in ``RFC3339`` format. Optional.
+                # Garbage collector will automatically retire expired exports if this field is set.
+                #expiresAt: "2002-10-02T15:00:00Z"
+                expiresAt: $(date -u --date="1 day" "+%Y-%m-%dT%H:%M:%SZ")
+                subject:
+                  kind: RestorePoint
+                  name: $LATEST_RESTORE_POINT
+                  namespace: $APPLICATION_NAMESPACE
+                profile:
+                  name: $THIRD_LOCATION_PROFILE
+                  namespace: kasten-io
+                exportData:
+                  enabled: true
+              EOF
+```
 
 ## Error handling
 
